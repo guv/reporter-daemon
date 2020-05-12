@@ -1,0 +1,70 @@
+#! /bin/sh
+
+### BEGIN INIT INFO
+# Provides:    reporter-daemon
+# Required-Start: $remote_fs $syslog
+# Required-Stop:  $remote_fs $syslog
+# Default-Start:  2 3 4 5
+# Default-Stop:   0 1 6
+# Short-Description: Reporter Daemon to monitor CTest instances
+### END INIT INFO
+
+
+INSTALL_DIR="/opt/reporter-daemon"
+CONFIG="daemon.conf"
+OPTS=""
+
+## Linux user and group
+RUN_AS_USER="reporter"
+RUN_AS_GROUP="reporter"
+
+## memory settings for the JVM
+MIN_MEMORY="256M"
+MAX_MEMORY="1G"
+
+
+PID_FILE="/var/run/reporter-daemon.pid"
+
+## do not change the following
+
+JAR="$INSTALL_DIR/reporter-daemon-LATEST.jar"
+
+JAVA=`(command -v java)`
+JAVA_OPTS="-Xms$MIN_MEMORY -Xmx$MAX_MEMORY -jar $JAR run -c "$INSTALL_DIR/$CONFIG" $OPTS"
+
+
+# Using the lsb functions to perform the operations.
+. /lib/lsb/init-functions
+
+case "$1" in
+  start)
+    log_daemon_msg "Starting reporter-daemon" "reporter-daemon" || true
+    if start-stop-daemon --start --oknodo --quiet --chuid "$RUN_AS_USER:$RUN_AS_GROUP" --chdir $INSTALL_DIR --background --make-pidfile --pidfile $PID_FILE --exec $JAVA -- $JAVA_OPTS; then
+       log_end_msg 0 || true
+    else
+       log_end_msg 1 || true
+    fi
+    ;;
+  stop)
+    log_daemon_msg "Stopping reporter-daemon" "reporter-daemon" || true
+    if start-stop-daemon --stop --oknodo --quiet --pidfile $PID_FILE; then
+       log_end_msg 0 || true
+    else
+       log_end_msg 1 || true
+    fi
+    ;;
+  restart)
+   log_daemon_msg "Restarting reporter-daemon" "reporter-daemon" || true
+   start-stop-daemon --stop --oknodo --quiet --retry 30 --pidfile $PID_FILE
+   if start-stop-daemon --start --oknodo --quiet --chuid "$RUN_AS_USER:$RUN_AS_GROUP" --chdir $INSTALL_DIR --background --make-pidfile --pidfile $PID_FILE --exec $JAVA -- $JAVA_OPTS; then
+       log_end_msg 0 || true
+   else
+       log_end_msg 1 || true
+   fi
+   ;;
+  *)
+    log_action_msg "Usage: /etc/init.d/reporter-daemon {start|stop|restart}" || true
+    exit 1
+esac
+
+exit 0
