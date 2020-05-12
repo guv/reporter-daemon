@@ -16,7 +16,7 @@ Download a release version of reporter-daemon:
 An initial configuration can be created as follows:
 
 ```bash
-java -jar reporter-daemon init -c daemon.conf
+java -jar reporter-daemon-<version>.jar init -c daemon.conf
 ```
 
 The generated configuration file `daemon.conf` looks similar to the following:
@@ -53,7 +53,7 @@ You need to adjust this configuration to your needs (see [Configuration](#config
 The reporter-daemon is started as follows:
 
 ```bash
-java -jar reporter-daemon run -c daemon.conf
+java -jar reporter-daemon-<version>.jar run -c daemon.conf
 ``` 
 
 
@@ -100,7 +100,7 @@ reporter-daemon to trust those certificates (`{:certificates {:path "mycertifica
 The `download` task is used as follows:
 
 ```bash
-java -jar reporter-daemon download --host my.server.org --port 443 --target myserver.pem
+java -jar reporter-daemon-<version>.jar download --host my.server.org --port 443 --target myserver.pem
 ```
 
 ### Email
@@ -203,7 +203,7 @@ With the `encrypt` task, the passwords in the specified configuration file
 can be encrypted using a master password.
 
 ```bash
-java -jar reporter-daemon encrypt -c daemon.conf
+java -jar reporter-daemon-<version>.jar encrypt -c daemon.conf
 Enter password:
 ```
 
